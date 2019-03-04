@@ -1,5 +1,5 @@
 classdef Turtle < handle
-    % LOGO turtle
+    % turtle
     
     properties
         x;
@@ -8,25 +8,26 @@ classdef Turtle < handle
         
         step_size;
         angle_increment;
+        offset;
     end
     
     methods
-        function this = Turtle(x0, y0, angle, step_size, angle_increment)
-            this.x = x0;
-            this.y = y0;
-            this.angle = angle;
+        function this = Turtle(step_size, angle_increment)
+            this.angle = 0;
             this.step_size = step_size;
             this.angle_increment = angle_increment;
+            
+            this.offset = 10;
         end
         
-        function newPicture = draw(this, picture, string)
-            newPicture = picture;
+        function picture = draw(this, string)
+            picture = ones(this.calculate(string)) * 255;
             for i = 1:length(string)
-                % for testing:
+                %for testing:
                 %fprintf("X = %d Y = %d angle = %d\n", this.x, this.y, this.angle);
                 switch string(i)
                     case 'F'
-                        newPicture = this.moveDraw(newPicture);
+                        picture = this.moveDraw(picture);
                     case 'f'
                         this.move();
                     case '+'
@@ -71,6 +72,51 @@ classdef Turtle < handle
         function turnLeft(this)
             this.angle = this.angle - this.angle_increment;
         end
+        
+        function size = calculate(this, string)
+            currentX = 0;
+            currentY = 0;
+            angle = 0;
+            
+            minX = 0;
+            minY = 0;
+            maxX = 0;
+            maxY = 0;
+            
+            for i = 1:length(string)
+                switch string(i)
+                    case 'F'
+                        currentX = round(currentX + this.step_size * cosd(angle));
+                        currentY = round(currentY + this.step_size * sind(angle));
+                    case 'f'
+                        currentX = round(currentX + this.step_size * cosd(angle));
+                        currentY = round(currentY + this.step_size * sind(angle));
+                    case '+'
+                        angle = angle + this.angle_increment;
+                    case '-'
+                        angle = angle - this.angle_increment;
+                    otherwise
+                        disp('wrong character!');                        
+                end
+                if(currentX < minX)
+                    minX = currentX;
+                end
+                if(currentX > maxX)
+                    maxX = currentX;
+                end
+                if(currentY < minY)
+                    minY = currentY;
+                end
+                if(currentY > maxY)
+                    maxY = currentY;
+                end
+            end
+            this.x = abs(minX) + this.offset;
+            this.y = abs(minY) + this.offset;
+            
+            size = [(maxX - minX) + 2 * this.offset, (maxY - minY) + 2 * this.offset];
+        end
+        
     end
     
 end
