@@ -1,5 +1,6 @@
 classdef Turtle < handle
     % turtle
+    % i know it can be optimized but maybe later
     
     properties
         x;
@@ -35,7 +36,7 @@ classdef Turtle < handle
                     case '-'
                         this.turnLeft();
                     otherwise
-                        disp('wrong character!');                        
+                        %disp('wrong character!');                        
                 end
             end
         end
@@ -96,7 +97,7 @@ classdef Turtle < handle
                     case '-'
                         angle = angle - this.angle_increment;
                     otherwise
-                        disp('wrong character!');                        
+                        %disp('wrong character!');                        
                 end
                 if(currentX < minX)
                     minX = currentX;
