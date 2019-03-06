@@ -1,20 +1,26 @@
 classdef Turtle < handle
-    % turtle
-    % i know it can be optimized but maybe later
+    % simple 2D turtle
+    % characters and their interpretations:
+    % 'F' - move forward and draw line
+    % 'f' - move forward without drawing the line
+    % '+' - turn right
+    % '-' - turn left
     
-    properties
-        x;
-        y;
-        angle;
-        
+    properties 
         step_size;
         angle_increment;
+    end
+    
+    properties (Access = private)
+        xOffset;
+        yOffset;
         offset;
+        buffer;
     end
     
     methods
-        function this = Turtle(step_size, angle_increment)
-            this.angle = 0;
+        
+        function this = Turtle(step_size, angle_increment)            
             this.step_size = step_size;
             this.angle_increment = angle_increment;
             
@@ -23,56 +29,25 @@ classdef Turtle < handle
         
         function picture = draw(this, string)
             picture = ones(this.calculate(string)) * 255;
-            for i = 1:length(string)
-                %for testing:
-                %fprintf("X = %d Y = %d angle = %d\n", this.x, this.y, this.angle);
-                switch string(i)
-                    case 'F'
-                        picture = this.moveDraw(picture);
-                    case 'f'
-                        this.move();
-                    case '+'
-                        this.turnRight();
-                    case '-'
-                        this.turnLeft();
-                    otherwise
-                        %disp('wrong character!');                        
-                end
+            for i = 1:length(this.buffer(:,1))
+                
+                oldX = this.buffer(i,1) + this.xOffset;
+                oldY = this.buffer(i,2) + this.yOffset;
+                newX = this.buffer(i,3) + this.xOffset;
+                newY = this.buffer(i,4) + this.yOffset;
+                
+                nPoints = max(abs(diff([newX, oldX])), abs(diff([newY, oldY])))+1;
+            
+                rIndex = round(linspace(oldX, newX, nPoints));
+                cIndex = round(linspace(oldY, newY, nPoints));
+                index = sub2ind(size(picture), rIndex, cIndex);
+                picture(index) = 0;
             end
         end
         
     end
     
     methods (Access = private)
-        function newPicture = moveDraw(this, picture)
-            newPicture = picture;
-            
-            newX = round(this.x + this.step_size * cosd(this.angle));
-            newY = round(this.y + this.step_size * sind(this.angle));
-    
-            nPoints = max(abs(diff([newX, this.x])), abs(diff([newY, this.y])))+1;
-            
-            rIndex = round(linspace(this.x, newX, nPoints));
-            cIndex = round(linspace(this.y, newY, nPoints));
-            index = sub2ind(size(newPicture), rIndex, cIndex);
-            newPicture(index) = 0;
-            
-            this.x = newX;
-            this.y = newY;            
-        end
-        
-        function move(this)
-            this.x = round(this.x + this.step_size * cosd(this.angle));
-            this.y = round(this.y + this.step_size * sind(this.angle));
-        end
-        
-        function turnRight(this)
-            this.angle = this.angle + this.angle_increment;
-        end
-        
-        function turnLeft(this)
-            this.angle = this.angle - this.angle_increment;
-        end
         
         function size = calculate(this, string)
             currentX = 0;
@@ -84,17 +59,30 @@ classdef Turtle < handle
             maxX = 0;
             maxY = 0;
             
+            % clear buffer
+            this.buffer = [];
+            
             for i = 1:length(string)
                 switch string(i)
-                    case 'F'
+                    case 'F'    % move forward and draw
+                        % save old coordinates
+                        oldX = currentX;
+                        oldY = currentY;
+                        % calculate new coordinates
                         currentX = round(currentX + this.step_size * cosd(angle));
                         currentY = round(currentY + this.step_size * sind(angle));
-                    case 'f'
+                        % add to buffer
+                        this.buffer = [this.buffer; [oldX, oldY, currentX, currentY]];
+                        
+                    case 'f'    % move forward without drawing
+                        % calculate new coordinates
                         currentX = round(currentX + this.step_size * cosd(angle));
                         currentY = round(currentY + this.step_size * sind(angle));
-                    case '+'
+                        
+                    case '+'    % turn right
                         angle = angle + this.angle_increment;
-                    case '-'
+                        
+                    case '-'    % turn left
                         angle = angle - this.angle_increment;
                     otherwise
                         %disp('wrong character!');                        
@@ -112,8 +100,8 @@ classdef Turtle < handle
                     maxY = currentY;
                 end
             end
-            this.x = abs(minX) + this.offset;
-            this.y = abs(minY) + this.offset;
+            this.xOffset = abs(minX) + this.offset;
+            this.yOffset = abs(minY) + this.offset;
             
             size = [(maxX - minX) + 2 * this.offset, (maxY - minY) + 2 * this.offset];
         end

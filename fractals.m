@@ -13,7 +13,7 @@ string2 = generate_successor(string1, productions);
 string3 = generate_successor(string2, productions);
 
 figure;
-myTurtle = Turtle(3, 90);
+myTurtle = Turtle(4, 90);
 imshow(myTurtle.draw(string3));
 
 %% combination of islands and lakes
@@ -23,8 +23,8 @@ axiom = 'F-F-F-F';
 string1 = generate_successor(axiom, productions);
 string2 = generate_successor(string1, productions);
 
-myTurtle = Turtle(5, 90);
 figure;
+myTurtle = Turtle(6, 90);
 imshow(myTurtle.draw(string2));
 
 %%
