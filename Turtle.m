@@ -5,6 +5,8 @@ classdef Turtle < handle
     % 'f' - move forward without drawing the line
     % '+' - turn right
     % '-' - turn left
+    % '[' - push current position and angle on stack
+    % ']' - pop position and angle from stack
     
     properties 
         step_size;
@@ -16,6 +18,7 @@ classdef Turtle < handle
         yOffset;
         offset;
         buffer;
+        stack;
     end
     
     methods
@@ -25,6 +28,7 @@ classdef Turtle < handle
             this.angle_increment = angle_increment;
             
             this.offset = 10;
+            this.stack = [];
         end
         
         function picture = draw(this, string)
@@ -61,6 +65,8 @@ classdef Turtle < handle
             
             % clear buffer
             this.buffer = [];
+            % clear stack
+            this.stack = [];
             
             for i = 1:length(string)
                 switch string(i)
@@ -84,6 +90,16 @@ classdef Turtle < handle
                         
                     case '-'    % turn left
                         angle = angle - this.angle_increment;
+                        
+                    case '['    % push to stack
+                        this.stack = [this.stack; [currentX, currentY, angle]];
+                        
+                    case ']'    % pop from stack
+                        currentX = this.stack(end,1);
+                        currentY = this.stack(end,2);
+                        angle = this.stack(end,3);
+                        
+                        this.stack = this.stack(1:end-1,:);
                     otherwise
                         %disp('wrong character!');                        
                 end

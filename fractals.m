@@ -70,13 +70,13 @@ productions = containers.Map({'l', 'r'}, {'l+rF+', '-Fl-r'});
 axiom = 'Fl';
 
 string = generate_successor(axiom, productions);
-for i = 1:9
+for i = 1:12
     string = generate_successor(string, productions);
 end
     
     
 figure;
-myTurtle = Turtle(10, 90);
+myTurtle = Turtle(2, 90);
 imshow(myTurtle.draw(string));
 
 %% angle increment = 120
